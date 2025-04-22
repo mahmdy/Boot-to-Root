@@ -80,7 +80,113 @@ nmap [IP] -p [port number / port numbers] -sV
 
 this is the basic network enummeration.
 
-# Web Enummeration process:
+# Step TWO Web Enummeration process:
 
 In most of the Boot to Root machines we will find web service enabled ethier on the regural port 80 or any other port
 you need to start by browsing the web server it self
+
+A very **IMP** note: ***check the source code of the web pages***, its a treasure.
+
+## Web directory brute-forcing:
+
+There are a lot of tools used for directory broute-forcing, to the date I am using dirb, and ffuf (if i staretd to use others I will update this section)
+
+**dirb**
+
+dirb is very easy to use:
+
+```
+dirb http://[IP]
+```
+dirb has its defuilt wordlist that it uses, but incase you want to use diffrent wordlist
+
+```
+dirb http://[IP] [the full apth of your wordlist]
+```
+
+if the web service is running on other port than port 80
+
+```
+dirb http://[IP]:[port number]
+```
+
+in case you want to look for the files under a specific directory you found
+
+```
+dirb http://[IP]/[Directory Name]
+```
+
+some times you would be intersted in finding files under specific extention/s
+
+```
+dirb http://[IP] -X .[ext1],.[ext2],.....
+```
+
+**fuff**
+
+Although **dirb** is easy to use but tools like **ffuf* would be more usefule and efficent
+
+```
+ffuf -w [bath for your wordlist] -u http://[IP]/FUZZ
+```
+
+using **ffuf** would just be like **dirb** when we are spacifing the port number, or the directorty we want to brute-force, bt for file extensions we will use **-e** insted of **-X** we used with **dirb**
+
+```
+ffuf -w [bath for your wordlist] -u http://[IP]/FUZZ -e .[ext1],.[ext2],....
+```
+
+we can use **/** after the **-e** to include directory with file extensions
+
+ffuf also provide fiture for subdomain brute-forcing
+
+```
+ffuf -w [path for the dubdomain wordlist] -u http://[IP] -H "Host: FUZZ.[IP]" -fs 0
+```
+
+again:
+
+**-w** this is the wordlist path
+
+**-u** stands for URL, which is the target IP
+
+**-H** for the subdomains discovery
+
+**-fs 0** filters responces with error to show only the found subdomains
+
+**hint:** sometimes it is usefule to address the target machine by its name not the ip address, to add the target machine into your hosts file
+
+```
+echo [IP] [machine name] |sudo tee -a /etc/hosts
+```
+
+## web vulnarability scanning
+
+for the vulnarability scanning we will use **nikto**, or **nmap vulnarability scanning scripts**
+
+**nikto**
+
+```
+nikto -h http://[IP]
+```
+
+nikto can scan also https
+
+
+```
+nikto -h https://[IP]
+```
+
+or any other specific port, also we can scan for vulnarabilities under sub driectories just as how we did it in directory brute-forcing
+
+**nmap**
+
+```
+nmap [ip] -sC --script=vuln
+```
+
+**-sC** script scanning
+
+you ca use **-sC** only for defuilt nmap scripts
+
+or you can spacify a spacific script to run from the **nmap** scripts avilable in ***/usr/share/nmap/scripts***
